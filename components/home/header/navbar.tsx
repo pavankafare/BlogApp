@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import ModeToggle from "./toggle-mode";
 import { Menu, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -62,11 +69,23 @@ const Navbar = () => {
 
             {/* <ToggleMode /> */}
             <ModeToggle />
-            
-            <div className="hidden md:flex items-center gap-2">
-              <Button variant="outline">Login</Button>
-              <Button>Signup</Button>
-            </div>
+
+            {/* UserActions  */}
+
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+            <SignedOut>
+              <div className="hidden md:flex items-center gap-2">
+                <SignInButton>
+                  <Button variant="outline">Login</Button>
+                </SignInButton>
+                <SignUpButton>
+                  <Button>Signup</Button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
+
             <Button
               variant="ghost"
               size="icon"
@@ -130,18 +149,18 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Auth Buttons */}
-            {/* <SignedOut> */}
-            <div className="px-4 flex flex-col gap-2">
-              {/* <SignInButton> */}
-              <Button variant="outline" className="w-full">
-                Login
-              </Button>
-              {/* </SignInButton> */}
-              {/* <SignUpButton> */}
-              <Button className="w-full">Sign up</Button>
-              {/* </SignUpButton> */}
-            </div>
-            {/* </SignedOut> */}
+            <SignedOut>
+              <div className="px-4 flex flex-col gap-2">
+                <SignInButton>
+                  <Button variant="outline" className="w-full">
+                    Login
+                  </Button>
+                </SignInButton>
+                <SignUpButton>
+                  <Button className="w-full">Sign up</Button>
+                </SignUpButton>
+              </div>
+            </SignedOut>
           </div>
         )}
       </div>
