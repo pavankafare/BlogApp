@@ -1,31 +1,58 @@
 "use client";
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Label } from "@radix-ui/react-dropdown-menu";
-import { Input } from "../ui/input";
+import { FormEvent, startTransition, useActionState, useState } from "react";
+// import "react-quill/dist/quill.snow.css";
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import dynamic from "next/dynamic";
-import "react-quill-new/dist/quill.snow.css";
-import { Button } from "../ui/button";
-const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+import { createArticles } from "@/actions/create-articles";
+// const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
+
 const CreateArticlePage = () => {
   const [content, setContent] = useState("");
-  let isPending = false;
+
+  const [formState, action, isPending] = useActionState(createArticles, {
+    errors: {},
+  });
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    formData.append("content", content);
+
+    // Wrap the action call in startTransition
+    startTransition(() => {
+      action(formData);
+    });
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl ">New Article</CardTitle>
+          <CardTitle className="text-2xl">Create New Article</CardTitle>
         </CardHeader>
         <CardContent>
-          <form>
-            <div className="speac-y-2">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
               <Label htmlFor="title">Article Title</Label>
               <Input
                 id="title"
                 name="title"
                 placeholder="Enter article title"
               />
+              {formState.errors.title && (
+                <span className="font-medium text-sm text-red-500">
+                  {formState.errors.title}
+                </span>
+              )}
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <select
@@ -38,11 +65,44 @@ const CreateArticlePage = () => {
                 <option value="programming">Programming</option>
                 <option value="web-development">Web Development</option>
               </select>
+              {formState.errors.category && (
+                <span className="font-medium text-sm text-red-500">
+                  {formState.errors.category}
+                </span>
+              )}
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="featuredImage">Featured Image</Label>
+              <Input
+                id="featuredImage"
+                name="featuredImage"
+                type="file"
+                accept="image/*"
+              />
+              {formState.errors.featuredImage && (
+                <span className="font-medium text-sm text-red-500">
+                  {formState.errors.featuredImage}
+                </span>
+              )}
+            </div>
+
             <div className="space-y-2">
               <Label>Content</Label>
               <ReactQuill theme="snow" value={content} onChange={setContent} />
+              {formState.errors.content && (
+                <span className="font-medium text-sm text-red-500">
+                  {formState.errors.content[0]}
+                </span>
+              )}
             </div>
+            {formState.errors.formErrors && (
+              <div className="dark:bg-transparent bg-red-100 p-2 border border-red-600">
+                <span className="font-medium text-sm text-red-500">
+                  {formState.errors.formErrors}
+                </span>
+              </div>
+            )}
             <div className="flex justify-end gap-4">
               <Button type="button" variant="outline">
                 Cancel
