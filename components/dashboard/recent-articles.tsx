@@ -10,8 +10,24 @@ import {
   TableRow,
 } from "../ui/table";
 import Link from "next/link";
-const RecentArticles = () => {
-  let articles = [1, 2, 3];
+import { Prisma } from "@prisma/client";
+
+type RecentArticlesProps = {
+  articles: Prisma.ArticlesGetPayload<{
+    include: {
+      comments: true;
+      author: {
+        select: {
+          name: true;
+          email: true;
+          imageUrl: true;
+        };
+      };
+    };
+  }>[];
+};
+
+const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
   return (
     <Card className="mb-8">
       <CardHeader>
@@ -38,22 +54,16 @@ const RecentArticles = () => {
             </TableHeader>
             <TableBody>
               {articles.slice(0, 5).map((article) => (
-                <TableRow
-                  key="1"
-                  //  key={article.id}
-                >
-                  <TableCell className="font-medium">
-                    hello
-                    {/* {article.title} */}
-                  </TableCell>
+                <TableRow key={article.id}>
+                  <TableCell className="font-medium">{article.title}</TableCell>
                   <TableCell>
                     <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
                       Published
                     </span>
                   </TableCell>
-                  <TableCell>{/* {article.comments.length} */}hello</TableCell>
+                  <TableCell>{article.comments.length}</TableCell>
                   <TableCell>
-                    {/* {new Date(article.createdAt).toDateString()} */}
+                    {new Date(article.createdAt).toDateString()}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -82,7 +92,7 @@ type DeleteButtonProps = {
 };
 
 const DeleteButton: React.FC<DeleteButtonProps> = ({ articleId }) => {
-//   const [isPending, startTransition] = useTransition();
+  //   const [isPending, startTransition] = useTransition();
 
   return (
     <form
@@ -92,9 +102,13 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({ articleId }) => {
     //   })
     // }
     >
-      <Button 
-    //   disabled={isPending} 
-      variant="ghost" size="sm" type="submit">delete
+      <Button
+        //   disabled={isPending}
+        variant="ghost"
+        size="sm"
+        type="submit"
+      >
+        delete
         {/* {isPending ? "Deleting..." : "Delete"} */}
       </Button>
     </form>
