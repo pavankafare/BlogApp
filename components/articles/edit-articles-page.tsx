@@ -10,11 +10,12 @@ import { Articles } from "@prisma/client";
 import { updateArticles } from "@/actions/update-article";
 import Image from "next/image";
 import React from "react";
+
 type EditPropsPage = {
   article: Articles;
 };
 const EditArticlePage: React.FC<EditPropsPage> = ({ article }) => {
-    
+
   const [content, setContent] = useState(article.content);
   const [formState, action, isPending] = useActionState(
     updateArticles.bind(null, article.id),
